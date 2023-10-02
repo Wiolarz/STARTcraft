@@ -5,6 +5,7 @@
 namespace Tools
 {
     BWAPI::Unit GetClosestUnitTo(BWAPI::Position p, const BWAPI::Unitset& units);
+    int GetMinerals();
     BWAPI::Unit GetClosestUnitTo(BWAPI::Unit unit, const BWAPI::Unitset& units);
 
     int CountUnitsOfType(BWAPI::UnitType type, const BWAPI::Unitset& units);

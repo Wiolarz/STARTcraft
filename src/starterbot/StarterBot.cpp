@@ -10,9 +10,12 @@ StarterBot::StarterBot()
 // Called when the bot starts!
 void StarterBot::onStart()
 {
+    
+    
     // Set our BWAPI options here    
 	BWAPI::Broodwar->setLocalSpeed(10);
     BWAPI::Broodwar->setFrameSkip(0);
+    
     
     // Enable the flag that tells BWAPI top let users enter input while bot plays
     BWAPI::Broodwar->enableFlag(BWAPI::Flag::UserInput);
@@ -24,6 +27,7 @@ void StarterBot::onStart()
 // Called on each frame of the game
 void StarterBot::onFrame()
 {
+
     // Update our MapTools information
     m_mapTools.onFrame();
 
@@ -35,6 +39,10 @@ void StarterBot::onFrame()
 
     // Build more supply if we are going to run out soon
     buildAdditionalSupply();
+
+    // Build Unit recruitment building, once Player has enough resources
+    buildBarracks();
+    
 
     // Draw unit health bars, which brood war unfortunately does not do
     Tools::DrawUnitHealthBars();
@@ -83,7 +91,7 @@ void StarterBot::trainAdditionalWorkers()
 // Build more supply if we are going to run out soon
 void StarterBot::buildAdditionalSupply()
 {
-    // Get the amount of supply supply we currently have unused
+    // Get the amount of supply we currently have unused
     const int unusedSupply = Tools::GetTotalSupply(true) - BWAPI::Broodwar->self()->supplyUsed();
 
     // If we have a sufficient amount of supply, we don't need to do anything
@@ -98,6 +106,29 @@ void StarterBot::buildAdditionalSupply()
         BWAPI::Broodwar->printf("Started Building %s", supplyProviderType.getName().c_str());
     }
 }
+
+
+void StarterBot::buildBarracks()
+{
+
+    //BWAPI::PlayerInterface::minerals();
+    // Get the amount of minerals we currently have unused
+    const int Minerals = Tools::GetMinerals();
+    BWAPI::Broodwar->printf("test1");
+    // If we have a sufficient amount of supply, we don't need to do anything
+    if (Minerals < 150) { return; }
+    BWAPI::Broodwar->printf("test2");
+    // Otherwise, we are going to build a Barracks
+    const BWAPI::UnitType recruitmentBuilding = BWAPI::UnitTypes::Terran_Barracks;
+
+    const bool startedBuilding = Tools::BuildBuilding(recruitmentBuilding);
+    if (startedBuilding)
+    {
+        BWAPI::Broodwar->printf("Started Building %s", recruitmentBuilding.getName().c_str());
+    }
+}
+
+
 
 // Draw some relevent information to the screen to help us debug the bot
 void StarterBot::drawDebugInformation()

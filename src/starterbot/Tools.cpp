@@ -15,6 +15,14 @@ BWAPI::Unit Tools::GetClosestUnitTo(BWAPI::Position p, const BWAPI::Unitset& uni
     return closestUnit;
 }
 
+
+int Tools::GetMinerals()
+{
+    return 150;//BWAPI::PlayerInterface::minerals();
+}
+
+
+
 BWAPI::Unit Tools::GetClosestUnitTo(BWAPI::Unit unit, const BWAPI::Unitset& units)
 {
     if (!unit) { return nullptr; }

@@ -38,6 +38,7 @@ int main(int argc, char * argv[])
             if (!BWAPI::Broodwar->isReplay()) 
             { 
                 std::cout << "Playing Game " << gameCount++ << " on map " << BWAPI::Broodwar->mapFileName() << "\n";
+                std::cout << "test2 " << "\n";
                 PlayGame(); 
             }
             else 
