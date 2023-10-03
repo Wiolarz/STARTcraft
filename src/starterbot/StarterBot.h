@@ -17,6 +17,7 @@ public:
     void trainAdditionalWorkers();
     void buildAdditionalSupply();
 	void buildBarracks();
+	void trainAdditionalMarines();
     void drawDebugInformation();
 
     // functions that are triggered by various BWAPI events from main.cpp

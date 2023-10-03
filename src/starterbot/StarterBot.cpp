@@ -42,6 +42,9 @@ void StarterBot::onFrame()
 
     // Build Unit recruitment building, once Player has enough resources
     buildBarracks();
+
+    // Train more workers so we can gather more income
+    trainAdditionalMarines();
     
 
     // Draw unit health bars, which brood war unfortunately does not do
@@ -94,12 +97,13 @@ void StarterBot::buildAdditionalSupply()
     // Get the amount of supply we currently have unused
     const int unusedSupply = Tools::GetTotalSupply(true) - BWAPI::Broodwar->self()->supplyUsed();
 
+
     // If we have a sufficient amount of supply, we don't need to do anything
-    if (unusedSupply >= 2) { return; }
+    if (unusedSupply >= (Tools::GetTotalSupply(true) / 20) + 2) { return; }
 
     // Otherwise, we are going to build a supply provider
     const BWAPI::UnitType supplyProviderType = BWAPI::Broodwar->self()->getRace().getSupplyProvider();
-
+    BWAPI::Broodwar->printf("supply 1");
     const bool startedBuilding = Tools::BuildBuilding(supplyProviderType);
     if (startedBuilding)
     {
@@ -110,23 +114,51 @@ void StarterBot::buildAdditionalSupply()
 
 void StarterBot::buildBarracks()
 {
+    const int barraksWanted = Tools::GetTotalSupply(true) / 20;
+    const int barracksOwned = Tools::CountUnitsOfType(BWAPI::UnitTypes::Terran_Barracks, BWAPI::Broodwar->self()->getUnits());
+
+    if (barracksOwned >= barraksWanted) { return; }
 
     //BWAPI::PlayerInterface::minerals();
     // Get the amount of minerals we currently have unused
     const int Minerals = Tools::GetMinerals();
-    BWAPI::Broodwar->printf("test1");
+    //BWAPI::Broodwar->printf("test1");
     // If we have a sufficient amount of supply, we don't need to do anything
     if (Minerals < 150) { return; }
-    BWAPI::Broodwar->printf("test2");
+    //BWAPI::Broodwar->printf("test2");
     // Otherwise, we are going to build a Barracks
     const BWAPI::UnitType recruitmentBuilding = BWAPI::UnitTypes::Terran_Barracks;
-
+    //BWAPI::Broodwar->printf("barracks 2");
     const bool startedBuilding = Tools::BuildBuilding(recruitmentBuilding);
     if (startedBuilding)
     {
         BWAPI::Broodwar->printf("Started Building %s", recruitmentBuilding.getName().c_str());
     }
 }
+
+
+// Train more marines so we can defend ourselves
+void StarterBot::trainAdditionalMarines()
+{
+    //BWAPI::Broodwar->printf("marines 1");
+    const BWAPI::UnitType unitType = BWAPI::UnitTypes::Terran_Marine;
+    const int marinesWanted = 100;
+    const int marinesOwned = Tools::CountUnitsOfType(unitType, BWAPI::Broodwar->self()->getUnits());
+    if (marinesOwned < marinesWanted)
+    {
+        // get the unit pointer to my depot
+        const BWAPI::Unitset myBarracks = Tools::GetBarracks();
+        for (auto unit : myBarracks)
+        {
+            // if we have a valid depot unit and it's currently not training something, train a marine
+            // there is no reason for a bot to ever use the unit queueing system, it just wastes resources
+            if (unit && !unit->isTraining()) { unit->train(unitType); }
+        }
+        
+        
+    }
+}
+
 
 
 

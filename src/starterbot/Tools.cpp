@@ -59,11 +59,44 @@ BWAPI::Unit Tools::GetUnitOfType(BWAPI::UnitType type)
     return nullptr;
 }
 
+BWAPI::Unitset Tools::GetUnitsOfType(BWAPI::UnitType type)
+{
+    BWAPI::Unitset unitArray;
+    bool notEmpty = false;
+    // For each unit that we own
+    for (auto& unit : BWAPI::Broodwar->self()->getUnits())
+    {
+        // if the unit is of the correct type, and it actually has been constructed, return it
+        if (unit->getType() == type && unit->isCompleted())
+        {
+            unitArray.insert(unit);
+            notEmpty = true;
+        }
+    }
+    if (notEmpty)
+    {
+        return unitArray;
+    }
+    // TODO
+    return unitArray;
+    // If we didn't find a valid unit to return, make sure we return nullptr
+    //return nullptr;
+}
+
+
 BWAPI::Unit Tools::GetDepot()
 {
     const BWAPI::UnitType depot = BWAPI::Broodwar->self()->getRace().getResourceDepot();
     return GetUnitOfType(depot);
 }
+
+BWAPI::Unitset Tools::GetBarracks()
+{
+    const BWAPI::UnitType depot = BWAPI::UnitTypes::Terran_Barracks;
+   
+    return GetUnitsOfType(depot);
+}
+
 
 // Attempt tp construct a building of a given type 
 bool Tools::BuildBuilding(BWAPI::UnitType type)
@@ -73,7 +106,25 @@ bool Tools::BuildBuilding(BWAPI::UnitType type)
 
     // Get a unit that we own that is of the given type so it can build
     // If we can't find a valid builder unit, then we have to cancel the building
-    BWAPI::Unit builder = Tools::GetUnitOfType(builderType);
+    BWAPI::Unitset builders = Tools::GetUnitsOfType(builderType);
+    BWAPI::Unit builder;
+
+    int occupiedBuilders = 0;
+    for (auto& unit : builders)
+    {
+
+        if (unit->isGatheringMinerals())
+        {
+            builder = unit;
+            break;
+        }
+        occupiedBuilders += 1;
+        if (occupiedBuilders > 2)
+        {
+            return false;
+        }
+    }
+
     if (!builder) { return false; }
 
     // Get a location that we want to build the building next to
